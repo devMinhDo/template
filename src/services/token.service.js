@@ -68,11 +68,11 @@ const verifyToken = async (token, type) => {
  * @param {string} [secret]
  * @returns {string}
  */
-const generateAuthTokens = (Email) => {
+const generateAuthTokens = (Address) => {
   try {
     return jwt.sign(
       {
-        Email,
+        Address,
       },
       config.jwt.secret,
       {

@@ -25,14 +25,15 @@ const loginUserWithEmailAndPassword = async (email, password) => {
  * @param {string} email
  * @returns {Promise}
  */
-const logout = async (email) => {
+const logout = async (address) => {
   let status = 'LOGIN';
-  const login = await findOneFilter({ email, isLogin: true });
-  if (login.length > 0) {
-    login[0].logoutTime = new Date();
-    login[0].isLogin = true;
-    login[0].code = 'refresh';
-    await login[0].save();
+  const login = await findOneFilter({ address, isLogin: true });
+  console.log('check login',login);
+  if (login) {
+    login.logoutTime = new Date();
+    login.isLogin = false;
+    login.code = 'refresh';
+    await login.save();
     status = 'LOGOUT';
     return status;
   }

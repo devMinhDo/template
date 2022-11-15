@@ -1,10 +1,10 @@
 const httpStatus = require('http-status');
+const bcrypt = require('bcryptjs');
 const catchAsync = require('../utils/catchAsync');
 // const web3 = require('../config/web3');
-
 const { LOGIN_CODE } = require('../constants/auth.constant');
 const { authService, userService, tokenService, emailService, historyLoginService } = require('../services');
-// const { TreeContractModel } = require('../models/index');
+const { getUserByEmail } = require('../services/user.service');
 
 const registerEmail = catchAsync(async (req, res) => {
   await userService.createUser(req.body);
@@ -14,14 +14,14 @@ const registerEmail = catchAsync(async (req, res) => {
 const loginEmail = catchAsync(async (req, res) => {
   const { email, password } = req.body;
   const user = await authService.loginUserWithEmailAndPassword(email, password);
-  const tokens = await tokenService.generateAuthTokens(email);
- const historyLogin = await historyLoginService.createNewHistory(user.Email, tokens, LOGIN_CODE.Email);
+  const tokens = await tokenService.generateAuthTokens(user.Address);
+  const historyLogin = await historyLoginService.createNewHistory(user.Address, tokens, LOGIN_CODE.Email);
   return res.status(200).json({ status: true, data: { token: tokens } });
 });
 
 const logout = catchAsync(async (req, res) => {
-  const { Email } = req.wallet;
-  const status = await authService.logout(Email);
+  const { Address } = req.wallet;
+  const status = await authService.logout(Address);
   return res.status(200).json({
     status,
   });
@@ -33,8 +33,15 @@ const refreshTokens = catchAsync(async (req, res) => {
 });
 
 const forgotPassword = catchAsync(async (req, res) => {
-  const resetPasswordToken = await tokenService.generateResetPasswordToken(req.body.email);
-  await emailService.sendResetPasswordEmail(req.body.email, resetPasswordToken);
+  const { email } = req.body;
+  const user = await getUserByEmail(email);
+  if (!user) return res.status(200).json({ status: false, message: 'User not found' });
+  const newPassword = Math.random().toString(36).slice(-8);
+  const salt = await bcrypt.genSaltSync(10);
+  const hash = await bcrypt.hashSync(newPassword, salt);
+  user.password = hash;
+
+  await emailService.sendResetPasswordEmail(req.body.email, newPassword);
   res.status(httpStatus.NO_CONTENT).send();
 });
 

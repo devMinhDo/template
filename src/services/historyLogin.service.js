@@ -10,13 +10,14 @@ const createNewHistory = async (address, token, code) => {
   });
 };
 
-const findLastSessionTokenLogin = async (Email) => {
-  const history = await HistoryLoginModel.find({ Email }).sort({ createdAt: -1 }).limit(1);
+const findLastSessionTokenLogin = async (address) => {
+  const history = await HistoryLoginModel.find({ address }).sort({ createdAt: -1 }).limit(1);
   return history[0];
 };
 
 const findOneFilter = async (filter) => {
-  return this.HistoryLoginModel.find(filter);
+  const history = await HistoryLoginModel.findOne(filter);
+  return history;
 };
 
 module.exports = {

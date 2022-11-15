@@ -20,10 +20,9 @@ module.exports.authJwt = async (req, res, next) => {
     });
   }
   token = token.split(' ')[1];
-  console.log('check',token);
   try {
-    const { Email } = jwt.verify(token, config.jwt.secret);
-    const wallet = await TreeContractModel.findOne({ Email });
+    const { Address } = jwt.verify(token, config.jwt.secret);
+    const wallet = await TreeContractModel.findOne({ Address });
     if (!wallet)
       return res.status(httpStatus.BAD_REQUEST).json({
         status: false,
@@ -35,8 +34,7 @@ module.exports.authJwt = async (req, res, next) => {
         message: `Your account is temporarily locked due to detecting misconduct. Please contact support@herobook.io for more details!.`,
       });
 
-    const checkSessionLogin = await historyLoginService.findLastSessionTokenLogin(Email);
-    console.log('check token :',checkSessionLogin)
+    const checkSessionLogin = await historyLoginService.findLastSessionTokenLogin(Address);
     if (token !== checkSessionLogin.token)
       return res.status(httpStatus.UNAUTHORIZED).json({
         status: false,
