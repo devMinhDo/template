@@ -48,6 +48,18 @@ const verifyEmail = {
     token: Joi.string().required(),
   }),
 };
+const verifyGoogle = {
+  body: Joi.object().keys({
+    idToken: Joi.string().required(),
+  }),
+};
+
+const verifyApple = {
+  body: Joi.object().keys({
+    idToken: Joi.string().required(),
+    nonce: Joi.string().required(),
+  }),
+};
 
 const loginWallet = {
   query: Joi.object().keys({
@@ -65,4 +77,6 @@ module.exports = {
   resetPassword,
   verifyEmail,
   loginWallet,
+  verifyGoogle,
+  verifyApple
 };

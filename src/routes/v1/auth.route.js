@@ -15,4 +15,6 @@ router.post('/reset-password', validate(authValidation.resetPassword), authContr
 router.post('/send-verification-email', authController.sendVerificationEmail);
 router.post('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
 // router.post('/login/wallet', validate(authValidation.loginWallet), authController.loginWallet);
+router.route('/verify-google').post(validate(authValidation.verifyGoogle), authController.verifyGoogleIdToken);
+router.route('/verify-apple').post(validate(authValidation.verifyApple), authController.verifyAppleIdToken);
 module.exports = router;
