@@ -78,5 +78,5 @@ module.exports = {
   verifyEmail,
   loginWallet,
   verifyGoogle,
-  verifyApple
+  verifyApple,
 };

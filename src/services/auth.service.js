@@ -28,7 +28,7 @@ const loginUserWithEmailAndPassword = async (email, password) => {
 const logout = async (address) => {
   let status = 'LOGIN';
   const login = await findOneFilter({ address, isLogin: true });
-  console.log('check login',login);
+  console.log('check login', login);
   if (login) {
     login.logoutTime = new Date();
     login.isLogin = false;

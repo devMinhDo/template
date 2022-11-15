@@ -1,5 +1,4 @@
 const winston = require('winston');
-const path = require('path');
 const config = require('./config');
 
 const enumerateErrorFormat = winston.format((info) => {
@@ -8,11 +7,6 @@ const enumerateErrorFormat = winston.format((info) => {
   }
   return info;
 });
-const dateObj = new Date();
-const month = dateObj.getUTCMonth() + 1;
-const day = dateObj.getUTCDate();
-const year = dateObj.getUTCFullYear();
-let fileName = `${day}_${month}_${year}`;
 
 const logger = winston.createLogger({
   level: config.env === 'development' ? 'debug' : 'info',
@@ -28,7 +22,7 @@ const logger = winston.createLogger({
     }),
     new winston.transports.File({
       level: 'error',
-      filename: path.join(__dirname, `${fileName}.txt`),
+      filename: require('../../root'),
     }),
   ],
 });

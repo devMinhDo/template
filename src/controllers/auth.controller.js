@@ -5,8 +5,8 @@ const catchAsync = require('../utils/catchAsync');
 const { LOGIN_CODE } = require('../constants/auth.constant');
 const { authService, userService, tokenService, emailService, historyLoginService } = require('../services');
 const { getUserByEmail } = require('../services/user.service');
-const {TreeContractModel} = require('../models');
-const {OAuth2Client} = require('google-auth-library');
+const { TreeContractModel } = require('../models');
+const { OAuth2Client } = require('google-auth-library');
 const appleSigninAuth = require('apple-signin-auth');
 const registerEmail = catchAsync(async (req, res) => {
   await userService.createUser(req.body);
@@ -95,14 +95,13 @@ const verifyGoogleIdToken = async (req, res) => {
       user = await registerNewEmail(data.user.email);
     }
     let newToken = tokenService.generateAuthTokens(user.Address);
-    await historyLoginService.createNewHistory(user.Address,newToken, "GOOGLE");
+    await historyLoginService.createNewHistory(user.Address, newToken, 'GOOGLE');
     return res.status(200).json({ status: true, data: { token: newToken } });
-  }
-  catch (e) {
+  } catch (e) {
     console.log(e.message);
-    return res.status(200).json({ status: false, message: "Internal error server" });
+    return res.status(200).json({ status: false, message: 'Internal error server' });
   }
-}
+};
 const verifyAppleIdToken = async (req, res) => {
   try {
     let { idToken, nonce } = req.body;
@@ -117,14 +116,13 @@ const verifyAppleIdToken = async (req, res) => {
       user = await registerNewEmail(data.email);
     }
     let newToken = tokenService.generateToken(user.Address);
-    await historyLoginService.createNewHistory(user.Address,newToken, "APPLE");
+    await historyLoginService.createNewHistory(user.Address, newToken, 'APPLE');
     return res.status(200).json({ status: true, data: { token: newToken } });
-  }
-  catch (e) {
+  } catch (e) {
     console.log(e.message);
-    return res.status(200).json({ status: false, message: "Internal error server" });
+    return res.status(200).json({ status: false, message: 'Internal error server' });
   }
-}
+};
 const verify = async (idToken) => {
   const client = new OAuth2Client(process.env.OAUTH_CLIENT_ID);
   let ticket = null;
@@ -133,15 +131,14 @@ const verify = async (idToken) => {
       idToken,
       audience: process.env.OAUTH_CLIENT_ID,
     });
-  }
-  catch (e) {
+  } catch (e) {
     console.error('error:', e.message);
     return null;
   }
   const payload = ticket.getPayload();
   console.log('payload:', payload);
   return payload;
-}
+};
 const registerNewEmail = async (email) => {
   try {
     const lastestTreeContractID = await TreeContractModel.findOne({}).sort({ ID: -1 });
@@ -152,12 +149,11 @@ const registerNewEmail = async (email) => {
       Email: email,
     }).save();
     return newUser;
-  }
-  catch (e) {
+  } catch (e) {
     console.log(e.message);
     return null;
   }
-}
+};
 module.exports = {
   loginEmail,
   logout,
@@ -169,6 +165,5 @@ module.exports = {
   registerEmail,
   // loginWallet,
   verifyGoogleIdToken,
-  verifyAppleIdToken
-
+  verifyAppleIdToken,
 };
