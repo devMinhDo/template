@@ -7,22 +7,21 @@ const { authService, userService, tokenService, emailService, historyLoginServic
 // const { TreeContractModel } = require('../models/index');
 
 const registerEmail = catchAsync(async (req, res) => {
-  const user = await userService.createUser(req.body);
-  const tokens = await tokenService.generateAuthTokens(user);
-  res.status(httpStatus.CREATED).send({ user, tokens });
+  await userService.createUser(req.body);
+  res.status(httpStatus.CREATED).send({ status: true, message: 'Registed success.' });
 });
 
 const loginEmail = catchAsync(async (req, res) => {
   const { email, password } = req.body;
   const user = await authService.loginUserWithEmailAndPassword(email, password);
-  const tokens = await tokenService.generateAuthTokens(user);
-  await historyLoginService.createNewHistory(user.Address, tokens, LOGIN_CODE.Email);
+  const tokens = await tokenService.generateAuthTokens(email);
+ const historyLogin = await historyLoginService.createNewHistory(user.Email, tokens, LOGIN_CODE.Email);
   return res.status(200).json({ status: true, data: { token: tokens } });
 });
 
 const logout = catchAsync(async (req, res) => {
-  const { email } = req.wallet;
-  const status = await authService.logout(email);
+  const { Email } = req.wallet;
+  const status = await authService.logout(Email);
   return res.status(200).json({
     status,
   });

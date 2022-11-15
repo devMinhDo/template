@@ -1,9 +1,9 @@
 const httpStatus = require('http-status');
-const config = require('../config/config');
 const jwt = require('jsonwebtoken');
+const moment = require('moment/moment');
+const config = require('../config/config');
 const { TreeContractModel, Version } = require('../models');
 const { historyLoginService } = require('../services');
-const moment = require('moment/moment');
 
 module.exports.authJwt = async (req, res, next) => {
   let token = req.headers.authorization;
@@ -20,10 +20,10 @@ module.exports.authJwt = async (req, res, next) => {
     });
   }
   token = token.split(' ')[1];
-
+  console.log('check',token);
   try {
-    const { Address } = jwt.verify(token, config.jwt.secret);
-    const wallet = await TreeContractModel.findOne({ Address });
+    const { Email } = jwt.verify(token, config.jwt.secret);
+    const wallet = await TreeContractModel.findOne({ Email });
     if (!wallet)
       return res.status(httpStatus.BAD_REQUEST).json({
         status: false,
@@ -35,14 +35,15 @@ module.exports.authJwt = async (req, res, next) => {
         message: `Your account is temporarily locked due to detecting misconduct. Please contact support@herobook.io for more details!.`,
       });
 
-    const checkSessionLogin = await historyLoginService.findLastSessionTokenLogin(Address);
+    const checkSessionLogin = await historyLoginService.findLastSessionTokenLogin(Email);
+    console.log('check token :',checkSessionLogin)
     if (token !== checkSessionLogin.token)
       return res.status(httpStatus.UNAUTHORIZED).json({
         status: false,
         message: 'This session is login before. You are login in many places!!!',
       });
 
-    let checkMaintain = await Version.findOne({});
+    const checkMaintain = await Version.findOne({});
     if (checkMaintain && checkMaintain.maintain === 1) {
       if (!checkMaintain.whitelist.includes(Address))
         return res.status(200).json({
@@ -68,6 +69,6 @@ module.exports.generateJWT = async (Address) => {
   try {
     return jwt.sign(payload, config.jwt.secret);
   } catch (error) {
-    console.log(error);
+    return error;
   }
 };

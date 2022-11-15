@@ -1,4 +1,5 @@
 const httpStatus = require('http-status');
+const bcrypt = require('bcryptjs');
 const tokenService = require('./token.service');
 const userService = require('./user.service');
 const Token = require('../models/token.model');
@@ -8,8 +9,13 @@ const { findOneFilter } = require('./historyLogin.service');
 
 const loginUserWithEmailAndPassword = async (email, password) => {
   const user = await userService.getUserByEmail(email);
-  if (!user || !(await user.isPasswordMatch(password))) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
+
+  if (!user) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'User not found');
+  }
+  const match = await bcrypt.compareSync(password, user.Password);
+  if (!match) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is not correct.');
   }
   return user;
 };

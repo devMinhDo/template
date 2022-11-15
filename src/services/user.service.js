@@ -1,4 +1,5 @@
 const httpStatus = require('http-status');
+const bcrypt = require('bcryptjs');
 const { TreeContractModel } = require('../models');
 const ApiError = require('../utils/ApiError');
 
@@ -11,7 +12,13 @@ const createUser = async (userBody) => {
   if (await TreeContractModel.isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
-  return User.create(userBody);
+  const salt = await bcrypt.genSaltSync(10);
+  const hash = await bcrypt.hashSync(userBody.Password, salt);
+  userBody.Password = hash;
+  const lastData = await TreeContractModel.find().sort({ ID: -1 }).limit(1);
+  lastData.length > 0 ? (userBody.ID = lastData[0].ID + 1) : (userBody.ID = 1);
+
+  return TreeContractModel.create(userBody);
 };
 
 /**
@@ -43,7 +50,7 @@ const getUserById = async (id) => {
  * @returns {Promise<User>}
  */
 const getUserByEmail = async (email) => {
-  return TreeContractModel.findOne({ email });
+  return TreeContractModel.findOne({ Email: email });
 };
 
 /**

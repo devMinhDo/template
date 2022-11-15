@@ -1,7 +1,7 @@
 const { HistoryLoginModel } = require('../models');
 
 const createNewHistory = async (address, token, code) => {
-  return await HistoryLoginModel.create({
+  return HistoryLoginModel.create({
     address,
     token,
     loginTime: new Date().getTime(),
@@ -10,18 +10,17 @@ const createNewHistory = async (address, token, code) => {
   });
 };
 
-const findLastSessionTokenLogin = async (address) => {
-  const history = await HistoryLoginModel.find({ address }).sort({ createdAt: -1 }).limit(1);
+const findLastSessionTokenLogin = async (Email) => {
+  const history = await HistoryLoginModel.find({ Email }).sort({ createdAt: -1 }).limit(1);
   return history[0];
 };
 
-const findOneFilter = async(filter) =>{
-  return await this.HistoryLoginModel.find(filter)
-}
+const findOneFilter = async (filter) => {
+  return this.HistoryLoginModel.find(filter);
+};
 
 module.exports = {
   createNewHistory,
   findLastSessionTokenLogin,
-  findOneFilter
+  findOneFilter,
 };
-

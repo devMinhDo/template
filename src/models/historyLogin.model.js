@@ -5,7 +5,9 @@ const historyLoginSchema = new mongoose.Schema(
   {
     address: {
       type: String,
-      required: true,
+    },
+    Email: {
+      type: String,
     },
     token: {
       type: String,
