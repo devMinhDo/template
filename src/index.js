@@ -1,15 +1,26 @@
 const mongoose = require('mongoose');
+const { models } = require('../models/index');
 const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
 
 let server;
-mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
-  logger.info('Connected to MongoDB');
+const { dbHeroSnake, sequelize } = require('./database');
+
+if (!dbHeroSnake) {
+  logger.error(`Connect DB ${config.heroSnake.url} fail`);
+}
+if (dbHeroSnake) {
   server = app.listen(config.port, () => {
     logger.info(`Listening to port ${config.port}`);
   });
-});
+}
+
+(async () => {
+  await sequelize.authenticate();
+  const dataa = await models.message.findOne();
+  console.log(dataa);
+})();
 
 const exitHandler = () => {
   if (server) {
